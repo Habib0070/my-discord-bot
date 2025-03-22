@@ -1,51 +1,57 @@
-# ?? START: Keep-alive Server (Flask)
 from flask import Flask
 import threading
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route("/")
 def home():
-    return "? Bot is running!"
+    return "✅ Bot is running!"
+
+def run_web():
+    app.run(host="0.0.0.0", port=8080)
+
+def keep_alive():
+    t = threading.Thread(target=run_web)
+    t.start()
+
+keep_alive()
+
+from flask import Flask
+import threading
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "✅ Bot is running!"
 
 def run():
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host="0.0.0.0", port=8080)
 
 def keep_alive():
     thread = threading.Thread(target=run)
     thread.start()
 
 keep_alive()
-# ?? END: Keep-alive Server (Flask)
-
-# --------------------- Your original code starts here ----------------------
 
 import discord
 from discord.ext import commands
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-# Ensure the bot token is loaded
 if not TOKEN:
     print("Error: DISCORD_TOKEN is not set in the .env file.")
     exit()
 
-# Set intents for bot to detect member join events
 intents = discord.Intents.default()
-intents.members = True  # Required to handle member join event
-intents.message_content = True  # Enable message content intent to respond to commands
-
-# Create bot instance
+intents.members = True
+intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
-
-# Remove default help command
 bot.remove_command('help')
 
-# Event: When a new channel is created (for ticket creation)
 @bot.event
 async def on_guild_channel_create(channel: discord.TextChannel):
     if 'ticket-' in channel.name:
